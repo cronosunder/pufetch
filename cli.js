@@ -18,7 +18,7 @@ updateNotifier({pkg}).notify();
 
 const spinner = ora();
 const arg = process.argv[2];
-const inf = process.argv[3];
+const urlLista = process.argv[3];
 const val = process.argv[4];
 
 const setName = `${Math.random().toString(16).substr(10)}.json`;
@@ -67,14 +67,14 @@ if (!arg || arg === '-h' || arg === '--help') {
 	end(1);
 }
 
-if (!inf || isUrl(inf) === false) {
+if (!urlLista || isUrl(urlLista) === false) {
 	log(`\n ${chalk.red('✖')} Things don't work this way. Provide a valid url\n\n ${chalk.blue('✔')} ${chalk.dim('Type')} ${chalk.cyan('$ puf --help')} ${chalk.dim('for more help')}\n`);
 	end(1);
 }
 
 if (arg === '-f' || arg === '--fetch') {
 	checkConnection();
-	got(inf).then(res => {
+	got(urlLista).then(res => {
 		const $ = cheerio.load(res.body);
 		const thumb = $('tr');
 
@@ -105,7 +105,7 @@ if (arg === '-f' || arg === '--fetch') {
 if (arg === '-e' || arg === '--export') {
 	checkConnection();
 
-	got(inf).then(res => {
+	got(urlLista).then(res => {
 		const $ = cheerio.load(res.body);
 		const tr = $('tr');
 		logUpdate(`\n ${chalk.blue('🍁')}  Done! Playlist exported ${chalk.green(tr.length)} as : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
@@ -140,7 +140,7 @@ if (arg === '-e' || arg === '--export') {
 if (arg === '-t' || arg === '--txt') {
 	checkConnection();
 
-	got(inf).then(res => {
+	got(urlLista).then(res => {
 		const $ = cheerio.load(res.body);
 		const tr = $('tr');
 		logUpdate(`\n ${chalk.blue('🍁')}  Done! Playlist exported ${chalk.green(tr.length)} as : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
@@ -152,7 +152,7 @@ if (arg === '-t' || arg === '--txt') {
 			for (let j = 0; j <= i; j++) {
 				obj.playlist.push(url + tr.eq(j).attr('data-video-id'));
 			}
-			logUpdate(`\n ${chalk.blue('🍁')} La lista tiene  : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
+			logUpdate(`\n ${chalk.blue('🍁')} La lista tiene  :  ${chalk.green(obj.playlist.length)}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
 			fs.writeFile(rad, obj.playlist.join("\n"), {spaces: 2}, err => {
 				end(1);
 				log(err);

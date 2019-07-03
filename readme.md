@@ -46,6 +46,7 @@ Usage: puf <commands> [url]
  Help:
    $ puf -f https://goo.gl/QcSugM --name
    $ puf -e https://goo.gl/QcSugM --name course
+   node cli.js -t https://www.youtube.com/playlist?list=PLq7S3lKa_paXSm6QsShz_-JRcAQQ85WY0 --name gordabella 
 
 ```
 
