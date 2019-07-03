@@ -7,6 +7,7 @@ const isUrl = require('is-url');
 const got = require('got');
 const ora = require('ora');
 const jsonFile = require('jsonfile');
+const fs = require('fs');
 const chalk = require('chalk');
 const cheerio = require('cheerio');
 const logUpdate = require('log-update');
@@ -21,14 +22,13 @@ const inf = process.argv[3];
 const val = process.argv[4];
 
 const setName = `${Math.random().toString(16).substr(10)}.json`;
-
+console.log("ARG",process.argv);
 let rad = `${process.argv[5]}.json` || setName;
-
 if (rad === 'undefined.json') {
 	rad = setName;
 }
 
-const log = console.log;
+const {log} = console;
 const end = process.exit;
 const url = 'https://youtube.com/watch?v=';
 
@@ -96,8 +96,8 @@ if (arg === '-f' || arg === '--fetch') {
 				spinner.stop();
 			});
 		}
-	}).catch(err => {
-		logUpdate(`\n${err}\n`);
+	}).catch(error => {
+		logUpdate(`\n${error}\n`);
 		end(1);
 	});
 }
@@ -108,9 +108,7 @@ if (arg === '-e' || arg === '--export') {
 	got(inf).then(res => {
 		const $ = cheerio.load(res.body);
 		const tr = $('tr');
-
-		logUpdate(`\n ${chalk.blue('🍁')}  Done! Playlist exported as : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
-
+		logUpdate(`\n ${chalk.blue('🍁')}  Done! Playlist exported ${chalk.green(tr.length)} as : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
 		for (let i = 0; i < tr.length; i++) {
 			const obj = {
 				playlist: []
@@ -123,16 +121,48 @@ if (arg === '-e' || arg === '--export') {
 					name: tr.eq(j).attr('data-title')
 				});
 			}
-
+			logUpdate(`\n ${chalk.blue('🍁')} La lista tiene  : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
 			jsonFile.writeFile(rad, obj, {spaces: 2}, err => {
 				end(1);
 				log(err);
 			});
 		}
+
 		spinner.stop();
-	}).catch(err => {
-		if (err) {
-			logUpdate(`${err}`);
+	}).catch(error => {
+		if (error) {
+			logUpdate(`${error}`);
+			end(1);
+		}
+	});
+}
+
+if (arg === '-t' || arg === '--txt') {
+	checkConnection();
+
+	got(inf).then(res => {
+		const $ = cheerio.load(res.body);
+		const tr = $('tr');
+		logUpdate(`\n ${chalk.blue('🍁')}  Done! Playlist exported ${chalk.green(tr.length)} as : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
+		for (let i = 0; i < tr.length; i++) {
+			const obj = {
+				playlist: []
+			};
+
+			for (let j = 0; j <= i; j++) {
+				obj.playlist.push(url + tr.eq(j).attr('data-video-id'));
+			}
+			logUpdate(`\n ${chalk.blue('🍁')} La lista tiene  : \n\n ${chalk.green('🌴')}  ${chalk.yellow(rad)} into ${chalk.blue(process.cwd())}\n`);
+			fs.writeFile(rad, obj.playlist.join("\n"), {spaces: 2}, err => {
+				end(1);
+				log(err);
+			});
+		}
+
+		spinner.stop();
+	}).catch(error => {
+		if (error) {
+			logUpdate(`${error}`);
 			end(1);
 		}
 	});
